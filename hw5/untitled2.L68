@@ -1,0 +1,53 @@
+00001000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.15.02
+Created On: 11/28/2014 7:24:05 PM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      :
+00000000                             3  * Written by :
+00000000                             4  * Date       :
+00000000                             5  * Description:
+00000000                             6  *-----------------------------------------------------------
+00001000                             7      ORG    $1000
+00001000                             8  START:                  ; first instruction of program
+00001000                             9  
+00001000                            10  * Put program code here
+00001000                            11  
+00001000  33FC FAFA 00007A50        12      MOVE.W  #$FAFA,CMP_ADDR
+00001008                            13  
+00001008  323C FAFA                 14      MOVE.W  #$FAFA,D1
+0000100C  343C 7A50                 15      MOVE.W  #$7A50,D2
+00001010                            16      
+00001010  B279 00007A50             17      CMP.W   CMP_ADDR,D1
+00001016  6700 0010                 18      BEQ     WTF
+0000101A  B479 00007A50             19      CMP.W   CMP_ADDR,D2
+00001020  6700 000E                 20      BEQ     OKAY
+00001024  6000 000E                 21      BRA     ENDPROGRAM
+00001028                            22      
+00001028  363C 0666                 23  WTF MOVE    #$666,D3
+0000102C  6000 0006                 24      BRA     ENDPROGRAM
+00001030                            25  
+00001030  383C 0777                 26  OKAY MOVE   #$777, D4
+00001034                            27  
+00001034  4247                      28  ENDPROGRAM CLR  D7
+00001036                            29  
+00001036  FFFF FFFF                 30      SIMHALT             ; halt simulator
+0000103A                            31  
+0000103A                            32  * Put variables and constants here
+0000103A                            33  
+0000103A  =00007A50                 34  CMP_ADDR        EQU     $7A50
+0000103A                            35  
+0000103A                            36      END    START        ; last line of source
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+CMP_ADDR            7A50
+ENDPROGRAM          1034
+OKAY                1030
+START               1000
+WTF                 1028

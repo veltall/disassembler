@@ -1,0 +1,429 @@
+00000400 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.15.02
+Created On: 11/28/2014 9:34:41 PM
+
+00000000                             1  *----------------------------------------------------------------------------
+00000000                             2  * Title      :      Homework 5 part 2 // Pattern finding and Cumulative sum
+00000000                             3  * Written by :      Vu Dinh
+00000000                             4  * Date       :      Nov 28 2014
+00000000                             5  * Comment    :      Not thoroughly tested.
+00000000                             6  *----------------------------------------------------------------------------
+00000400                             7      ORG    $400
+00000400                             8  START:                  ; first instruction of program
+00000400                             9  
+00000400                            10  
+00000400  6100 0250                 11      BSR     PRINT_INPUT_PROMPT
+00000404                            12  
+00000404                            13  ************************************************************************************
+00000404                            14  
+00000404                            15  * --------------------------------------------------------
+00000404                            16  * ----------------------- SUBROUTINE ---------------------
+00000404                            17  * --------------------------------------------------------
+00000404                            18  * | I borrowed this String --> Hex conversion subroutine |
+00000404                            19  * | from the disassembler project.                       |
+00000404                            20  * |     post-condition: The converted hex location is    |
+00000404                            21  * |                     stored in D4.                    |
+00000404                            22  * --------------------------------------------------------
+00000404                            23  
+00000404                            24  
+00000404  4241                      25  CONVERT_START_LOCATION  CLR     D1
+00000406  227C 00007000             26                          MOVEA.L #$7000,A1
+0000040C  103C 0002                 27                          MOVE.B  #2,D0   * --- read NULL-terminated string
+00000410  4E4F                      28                          TRAP    #15     * --- read string into (A1)
+00000412  2649                      29                          MOVEA.L A1,A3   * --- make a copy to preserve original input
+00000414  6100 0006                 30  END_CONVERT_START_LOCATION  BSR     CONVERT_LOOP
+00000418  6000 017A                 31                              BRA     CONVERT_DONE
+0000041C                            32  
+0000041C                            33  * ---------------- convert string into hex
+0000041C                            34  * -- pre-condition:     (A3) points to the top of the STR stack
+0000041C                            35  
+0000041C  B27C 0000                 36  CONVERT_LOOP            CMP.W   #0,D1
+00000420  6700 000A                 37                          BEQ     END_CONVERT_LOOP        * -- done converting whole string
+00000424  6100 0008                 38                          BSR     CONVERT_STR_TO_HEX
+00000428  5301                      39                          SUB.B   #1,D1
+0000042A  60F0                      40                          BRA     CONVERT_LOOP
+0000042C  4E75                      41  END_CONVERT_LOOP        RTS     * -- return to main flow
+0000042E                            42  
+0000042E                            43  * -------------------------------------------------------------------------
+0000042E                            44  * ------- SUBROUTINE Convert ONE Character into ONE HEX value -------------
+0000042E                            45  
+0000042E  161B                      46  CONVERT_STR_TO_HEX      MOVE.B  (A3)+,D3    * -- pop one character
+00000430  B63C 0030                 47                          CMP.B   #$30,D3     * -- #$30 is the character '0'
+00000434  6700 00B2                 48                          BEQ     STR_TO_HEX_ZERO
+00000438                            49  
+00000438  B63C 0031                 50                          CMP.B   #$31,D3
+0000043C  6700 00B4                 51                          BEQ     STR_TO_HEX_ONE
+00000440                            52                          
+00000440  B63C 0032                 53                          CMP.B   #$32,D3
+00000444  6700 00B6                 54                          BEQ     STR_TO_HEX_TWO
+00000448                            55                          
+00000448  B63C 0033                 56                          CMP.B   #$33,D3
+0000044C  6700 00B8                 57                          BEQ     STR_TO_HEX_THREE
+00000450                            58                          
+00000450  B63C 0034                 59                          CMP.B   #$34,D3
+00000454  6700 00BA                 60                          BEQ     STR_TO_HEX_FOUR
+00000458                            61                          
+00000458  B63C 0035                 62                          CMP.B   #$35,D3
+0000045C  6700 00BC                 63                          BEQ     STR_TO_HEX_FIVE
+00000460                            64                          
+00000460  B63C 0036                 65                          CMP.B   #$36,D3
+00000464  6700 00BE                 66                          BEQ     STR_TO_HEX_SIX
+00000468                            67                          
+00000468  B63C 0037                 68                          CMP.B   #$37,D3
+0000046C  6700 00C0                 69                          BEQ     STR_TO_HEX_SEVEN
+00000470                            70                          
+00000470  B63C 0038                 71                          CMP.B   #$38,D3
+00000474  6700 00C2                 72                          BEQ     STR_TO_HEX_EIGHT
+00000478                            73                          
+00000478  B63C 0039                 74                          CMP.B   #$39,D3             * -- #$39 is the character '9'
+0000047C  6700 00C4                 75                          BEQ     STR_TO_HEX_NINE
+00000480                            76                          
+00000480  B63C 0041                 77                          CMP.B   #$41,D3             * -- #$41 is the character 'A'
+00000484  6700 00C6                 78                          BEQ     STR_TO_HEX_A
+00000488  B63C 0061                 79                          CMP.B   #$61,D3             * -- #$61 is the character 'a'
+0000048C  6700 00BE                 80                          BEQ     STR_TO_HEX_A
+00000490                            81  
+00000490  B63C 0042                 82                          CMP.B   #$42,D3
+00000494  6700 00C0                 83                          BEQ     STR_TO_HEX_B
+00000498  B63C 0062                 84                          CMP.B   #$62,D3
+0000049C  6700 00B8                 85                          BEQ     STR_TO_HEX_B
+000004A0                            86                          
+000004A0  B63C 0043                 87                          CMP.B   #$43,D3
+000004A4  6700 00BA                 88                          BEQ     STR_TO_HEX_C
+000004A8  B63C 0063                 89                          CMP.B   #$63,D3
+000004AC  6700 00B2                 90                          BEQ     STR_TO_HEX_C
+000004B0                            91  
+000004B0  B63C 0044                 92                          CMP.B   #$44,D3
+000004B4  6700 00B4                 93                          BEQ     STR_TO_HEX_D
+000004B8  B63C 0064                 94                          CMP.B   #$64,D3
+000004BC  6700 00AC                 95                          BEQ     STR_TO_HEX_D
+000004C0                            96                          
+000004C0  B63C 0045                 97                          CMP.B   #$45,D3
+000004C4  6700 00AE                 98                          BEQ     STR_TO_HEX_E
+000004C8  B63C 0065                 99                          CMP.B   #$65,D3
+000004CC  6700 00A6                100                          BEQ     STR_TO_HEX_E
+000004D0                           101                          
+000004D0  B63C 0046                102                          CMP.B   #$46,D3
+000004D4  6700 00A8                103                          BEQ     STR_TO_HEX_F
+000004D8  B63C 0066                104                          CMP.B   #$66,D3
+000004DC  6700 00A0                105                          BEQ     STR_TO_HEX_F
+000004E0                           106  
+000004E0  6000 0002                107                          BRA     INVALID_CHARACTER
+000004E4                           108  
+000004E4                           109  * --------------- Conversion definitions ------------
+000004E4                           110  
+000004E4  4E71                     111  INVALID_CHARACTER       NOP              * -- skip invalid character
+000004E6  4E75                     112                          RTS
+000004E8  7600                     113  STR_TO_HEX_ZERO         MOVE.L  #$0,D3   * -- push HEX 0 into HEX stack
+000004EA  6100 009C                114                          BSR     SHIFT_START_ADDR
+000004EE  D883                     115                          ADD.L   D3,D4
+000004F0  4E75                     116                          RTS
+000004F2  7601                     117  STR_TO_HEX_ONE          MOVE.L  #$1,D3   * -- push HEX 1 into HEX stack
+000004F4  6100 0092                118                          BSR     SHIFT_START_ADDR
+000004F8  D883                     119                          ADD.L   D3,D4
+000004FA  4E75                     120                          RTS
+000004FC  7602                     121  STR_TO_HEX_TWO          MOVE.L  #$2,D3   * -- push HEX 2 into HEX stack
+000004FE  6100 0088                122                          BSR     SHIFT_START_ADDR
+00000502  D883                     123                          ADD.L   D3,D4
+00000504  4E75                     124                          RTS
+00000506  7603                     125  STR_TO_HEX_THREE        MOVE.L  #$3,D3   * -- push HEX 3 into HEX stack
+00000508  6100 007E                126                          BSR     SHIFT_START_ADDR
+0000050C  D883                     127                          ADD.L   D3,D4
+0000050E  4E75                     128                          RTS
+00000510  7604                     129  STR_TO_HEX_FOUR         MOVE.L  #$4,D3   * -- push HEX 4 into HEX stack
+00000512  6100 0074                130                          BSR     SHIFT_START_ADDR
+00000516  D883                     131                          ADD.L   D3,D4
+00000518  4E75                     132                          RTS
+0000051A  7605                     133  STR_TO_HEX_FIVE         MOVE.L  #$5,D3   * -- push HEX 5 into HEX stack
+0000051C  6100 006A                134                          BSR     SHIFT_START_ADDR
+00000520  D883                     135                          ADD.L   D3,D4
+00000522  4E75                     136                          RTS
+00000524  7606                     137  STR_TO_HEX_SIX          MOVE.L  #$6,D3   * -- push HEX 6 into HEX stack
+00000526  6100 0060                138                          BSR     SHIFT_START_ADDR
+0000052A  D883                     139                          ADD.L   D3,D4
+0000052C  4E75                     140                          RTS
+0000052E  7607                     141  STR_TO_HEX_SEVEN        MOVE.L  #$7,D3   * -- push HEX 7 into HEX stack
+00000530  6100 0056                142                          BSR     SHIFT_START_ADDR
+00000534  D883                     143                          ADD.L   D3,D4
+00000536  4E75                     144                          RTS
+00000538  7608                     145  STR_TO_HEX_EIGHT        MOVE.L  #$8,D3   * -- push HEX 8 into HEX stack
+0000053A  6100 004C                146                          BSR     SHIFT_START_ADDR
+0000053E  D883                     147                          ADD.L   D3,D4
+00000540  4E75                     148                          RTS
+00000542  7609                     149  STR_TO_HEX_NINE         MOVE.L  #$9,D3   * -- push HEX 9 into HEX stack
+00000544  6100 0042                150                          BSR     SHIFT_START_ADDR
+00000548  D883                     151                          ADD.L   D3,D4
+0000054A  4E75                     152                          RTS
+0000054C  760A                     153  STR_TO_HEX_A            MOVE.L  #$A,D3   * -- push HEX A into HEX stack
+0000054E  6100 0038                154                          BSR     SHIFT_START_ADDR
+00000552  D883                     155                          ADD.L   D3,D4
+00000554  4E75                     156                          RTS
+00000556  760B                     157  STR_TO_HEX_B            MOVE.L  #$B,D3   * -- push HEX B into HEX stack
+00000558  6100 002E                158                          BSR     SHIFT_START_ADDR
+0000055C  D883                     159                          ADD.L   D3,D4
+0000055E  4E75                     160                          RTS
+00000560  760C                     161  STR_TO_HEX_C            MOVE.L  #$C,D3   * -- push HEX C into HEX stack
+00000562  6100 0024                162                          BSR     SHIFT_START_ADDR
+00000566  D883                     163                          ADD.L   D3,D4
+00000568  4E75                     164                          RTS
+0000056A  760D                     165  STR_TO_HEX_D            MOVE.L  #$D,D3   * -- push HEX D into HEX stack
+0000056C  6100 001A                166                          BSR     SHIFT_START_ADDR
+00000570  D883                     167                          ADD.L   D3,D4
+00000572  4E75                     168                          RTS
+00000574  760E                     169  STR_TO_HEX_E            MOVE.L  #$E,D3   * -- push HEX E into HEX stack
+00000576  6100 0010                170                          BSR     SHIFT_START_ADDR
+0000057A  D883                     171                          ADD.L   D3,D4
+0000057C  4E75                     172                          RTS
+0000057E  760F                     173  STR_TO_HEX_F            MOVE.L  #$F,D3   * -- push HEX F into HEX stack
+00000580  6100 0006                174                          BSR     SHIFT_START_ADDR
+00000584  D883                     175                          ADD.L   D3,D4
+00000586  4E75                     176                          RTS
+00000588                           177  
+00000588  4247                     178  SHIFT_START_ADDR        CLR     D7
+0000058A  3E01                     179                          MOVE.W  D1,D7
+0000058C  5347                     180                          SUB.W   #1,D7
+0000058E  E547                     181                          ASL     #2,D7   * -- D7 = (D1 - 1) * 4
+00000590  EFA3                     182                          ASL.L   D7,D3
+00000592  4E75                     183  END_SHIFT_START_ADDR    RTS
+00000594                           184  
+00000594                           185  
+00000594                           186  * --------------------------------------------------------
+00000594                           187  * ----------------- END OF SUBROUTINE --------------------
+00000594                           188  * --------------------------------------------------------
+00000594                           189  * | I borrowed this String --> Hex conversion subroutine |
+00000594                           190  * | from the project.                                    |
+00000594                           191  * |     post-condition: The converted hex location is    |
+00000594                           192  * |                     stored in D4.                    |
+00000594                           193  * --------------------------------------------------------
+00000594                           194  
+00000594                           195  
+00000594                           196  ***********************************************************************************
+00000594                           197  
+00000594  23C4 00000744            198  CONVERT_DONE    MOVE.L  D4, INPUT_ADDRESS   * -- store the addr at the end of the program
+0000059A  2A04                     199                  MOVE.L  D4, D5              * -- make a copy
+0000059C  B8BC 00000000            200                  CMP.L   #$0, D4
+000005A2  6D00 0006                201                  BLT     NEGATIVE
+000005A6  6000 0010                202                  BRA     EXTRACT_EXP
+000005AA                           203  
+000005AA  163C 0001                204  NEGATIVE        MOVE.B  #1, D3              * -- Store the sign bit in D3
+000005AE  0484 80000000            205                  SUB.L   #$80000000, D4
+000005B4  6000 0002                206                  BRA     EXTRACT_EXP
+000005B8                           207  
+000005B8                           208  * --------------------------- Finished processing the sign bit
+000005B8                           209  
+000005B8  103C 0017                210  EXTRACT_EXP     MOVE.B  #23, D0     * -- shifting the IEEE number by 23 bits
+000005BC                           211                                      * -- to the right will expose the exponent
+000005BC                           212                                      * -- Sign-extension is a problem, but it is
+000005BC                           213                                      * -- taken care of in the NEGATIVE branch if
+000005BC                           214                                      * -- the number IS negative.
+000005BC  E0A4                     215                  ASR.L   D0, D4
+000005BE  2C04                     216  STORE_EXP       MOVE.L  D4, D6      * -- Store the exponent in D6
+000005C0  6000 0002                217                  BRA     EXTRACT_MANT
+000005C4                           218  
+000005C4                           219  * --------------------------- Finished processing the exponent
+000005C4                           220                  
+000005C4  2E05                     221  EXTRACT_MANT    MOVE.L  D5, D7      * -- Move the copy to D7
+000005C6  E1A4                     222                  ASL.L   D0, D4      * -- Shift the exponent 23-bits to the left
+000005C8  9E84                     223                  SUB.L   D4, D7      * -- Original value - exponent value = mantissa       
+000005CA                           224  
+000005CA  4241                     225  COUNT_MASTISSA  CLR     D1
+000005CC  B03C 0000                226  ROTATE_LOOP     CMP.B   #0, D0
+000005D0  6700 0010                227                  BEQ     ROTATE_DONE
+000005D4  E29F                     228                  ROR.L   #1,D7
+000005D6  6500 0006                229                  BCS     INCREMENT_MANT  * -- if the bit 1 is rotated out, C = 1
+000005DA  5300                     230  CONT_ROTATE     SUB.B   #1, D0
+000005DC  60EE                     231                  BRA     ROTATE_LOOP
+000005DE                           232          
+000005DE  5201                     233  INCREMENT_MANT  ADD.B   #1, D1      * -- D1 (later D7) stores the count of the 1's in the mantissa
+000005E0  60F8                     234                  BRA     CONT_ROTATE
+000005E2                           235              
+000005E2  6000 0002                236  ROTATE_DONE     BRA     PRINT_RESULT
+000005E6                           237  
+000005E6                           238  * --------------------------- Finished processing the mantissa
+000005E6                           239  
+000005E6                           240  
+000005E6                           241  
+000005E6                           242  ************************************************************************
+000005E6                           243  ************************* OUTPUT OUTPUT OUTPUT *************************
+000005E6                           244  ************************************************************************
+000005E6                           245  ************************* OUTPUT OUTPUT OUTPUT *************************
+000005E6                           246  ************************************************************************
+000005E6                           247  ************************* OUTPUT OUTPUT OUTPUT *************************
+000005E6                           248  ************************************************************************
+000005E6                           249  
+000005E6  6100 0078                250  PRINT_RESULT    BSR     PRINT_OUTPUT_SEPARATOR
+000005EA  2E01                     251                  MOVE.L  D1, D7  * -- make a copy of the mantissa results
+000005EC                           252              
+000005EC                           253  * ------------------------------------------- sign bit
+000005EC  6100 0080                254  PRIME_SIGNBIT   BSR     PRINT_OUTPUT_SIGNBIT
+000005F0  B63C 0001                255                  CMP.B   #1, D3
+000005F4  6700 0006                256                  BEQ     SIGNBIT_NEG
+000005F8  6000 000A                257                  BRA     SIGNBIT_POS
+000005FC                           258  
+000005FC  6100 008C                259  SIGNBIT_NEG     BSR     PRINT_SIGNBIT_NEGATIVE
+00000600  6000 000A                260                  BRA     PRIME_EXPONENT
+00000604  6100 0076                261  SIGNBIT_POS     BSR     PRINT_SIGNBIT_POSITIVE
+00000608  6000 0002                262                  BRA     PRIME_EXPONENT
+0000060C                           263  
+0000060C                           264  * ------------------------------------------- exponent
+0000060C  6100 0036                265  PRIME_EXPONENT  BSR     PRINT_EMPTY_LINE
+00000610  6100 0086                266                  BSR     PRINT_OUTPUT_EXPONENT
+00000614  2206                     267                  MOVE.L  D6, D1  * -- the exponent to be printed
+00000616  143C 000A                268                  MOVE.B  #10, D2 * -- print in base 10
+0000061A  103C 000F                269                  MOVE.B  #15, D0 * -- trap task #15
+0000061E  4E4F                     270                  TRAP    #15
+00000620  6000 0002                271                  BRA     PRIME_MANTISSA
+00000624                           272  
+00000624                           273  * ------------------------------------------- mantissa  (now stored in D7)
+00000624  6100 001E                274  PRIME_MANTISSA  BSR     PRINT_EMPTY_LINE
+00000628  6100 007C                275                  BSR     PRINT_OUTPUT_MANTISSA
+0000062C  2207                     276                  MOVE.L  D7, D1  * -- the exponent to be printed
+0000062E  143C 000A                277                  MOVE.B  #10, D2 * -- print in base 10
+00000632  103C 000F                278                  MOVE.B  #15, D0 * -- trap task #15
+00000636  4E4F                     279                  TRAP    #15
+00000638                           280  
+00000638  6100 000A                281  CLEANING_UP     BSR     PRINT_EMPTY_LINE
+0000063C  6100 0022                282                  BSR     PRINT_OUTPUT_SEPARATOR
+00000640  6000 0072                283                  BRA     END_PROGRAM
+00000644                           284           
+00000644                           285          
+00000644                           286  * -----------------------------------------------------
+00000644                           287  * ----------- PROGRAM FLOW SUBROUTINES ----------------
+00000644                           288  * -----------------------------------------------------
+00000644                           289  
+00000644  43F9 000006BA            290  PRINT_EMPTY_LINE    LEA     EMPTY_LINE, A1
+0000064A  103C 000D                291                      MOVE.B  #13, D0
+0000064E  4E4F                     292                      TRAP    #15
+00000650  4E75                     293                      RTS
+00000652                           294  
+00000652  43F9 000006BB            295  PRINT_INPUT_PROMPT  LEA     INPUT_PROMPT, A1    * -- displaying input message
+00000658  103C 000E                296                      MOVE.B  #14, D0
+0000065C  4E4F                     297                      TRAP    #15
+0000065E  4E75                     298                      RTS
+00000660                           299  
+00000660  43F9 000006FB            300  PRINT_OUTPUT_SEPARATOR  LEA         OUTPUT_SEPARATOR, A1
+00000666  103C 000D                301                          MOVE.B      #13, D0
+0000066A  4E4F                     302                          TRAP        #15
+0000066C  4E75                     303                          RTS
+0000066E                           304  
+0000066E                           305  * ----------- sign bit
+0000066E                           306  
+0000066E  43F9 0000071E            307  PRINT_OUTPUT_SIGNBIT    LEA         OUTPUT_SIGNBIT, A1
+00000674  103C 000E                308                          MOVE.B      #14, D0
+00000678  4E4F                     309                          TRAP        #15
+0000067A  4E75                     310                          RTS
+0000067C                           311  
+0000067C  43F9 0000073F            312  PRINT_SIGNBIT_POSITIVE  LEA         OUTPUT_SIGNBIT_POSITIVE, A1
+00000682  103C 000E                313                          MOVE.B      #14, D0
+00000686  4E4F                     314                          TRAP        #15
+00000688  4E75                     315                          RTS
+0000068A                           316  
+0000068A  43F9 00000741            317  PRINT_SIGNBIT_NEGATIVE  LEA         OUTPUT_SIGNBIT_NEGATIVE, A1
+00000690  103C 000E                318                          MOVE.B      #14, D0
+00000694  4E4F                     319                          TRAP        #15
+00000696  4E75                     320                          RTS
+00000698                           321      
+00000698                           322  * ----------- exponent
+00000698                           323  
+00000698  43F9 00000729            324  PRINT_OUTPUT_EXPONENT   LEA         OUTPUT_EXPONENT, A1
+0000069E  103C 000E                325                          MOVE.B      #14, D0
+000006A2  4E4F                     326                          TRAP        #15
+000006A4  4E75                     327                          RTS
+000006A6                           328  
+000006A6                           329  * ----------- mastissa
+000006A6                           330  
+000006A6  43F9 00000734            331  PRINT_OUTPUT_MANTISSA   LEA         OUTPUT_MANTISSA, A1
+000006AC  103C 000E                332                          MOVE.B      #14, D0
+000006B0  4E4F                     333                          TRAP        #15
+000006B2  4E75                     334                          RTS
+000006B4                           335  
+000006B4                           336  
+000006B4  4242                     337  END_PROGRAM  CLR    D2
+000006B6                           338  
+000006B6  FFFF FFFF                339      SIMHALT
+000006BA                           340  
+000006BA                           341  * Put variables and constants here
+000006BA                           342  
+000006BA= 00                       343  EMPTY_LINE      DC.B    '', 0
+000006BB                           344  
+000006BB= 50 6C 65 61 73 65 ...    345  INPUT_PROMPT    DC.B    'Please enter IEEE 32-bit floating point number in hexadecimal: ', 0
+000006FB                           346  
+000006FB= 3D 3D 3D 3D 3D 3D ...    347  OUTPUT_SEPARATOR    DC.B    '==================================', 0
+0000071E= 53 69 67 6E 20 62 ...    348  OUTPUT_SIGNBIT      DC.B    'Sign bit: ', 0
+00000729= 45 78 70 6F 6E 65 ...    349  OUTPUT_EXPONENT     DC.B    'Exponent: ', 0
+00000734= 4D 61 6E 74 69 73 ...    350  OUTPUT_MANTISSA     DC.B    'Mantissa: ', 0
+0000073F                           351  
+0000073F= 2B 00                    352  OUTPUT_SIGNBIT_POSITIVE     DC.B    '+', 0
+00000741= 2D 00                    353  OUTPUT_SIGNBIT_NEGATIVE     DC.B    '-', 0
+00000743                           354  
+00000744                           355  INPUT_ADDRESS   DS.L    $1
+00000748                           356  
+00000748                           357      END    START        ; last line of source
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+CLEANING_UP         638
+CONT_ROTATE         5DA
+CONVERT_DONE        594
+CONVERT_LOOP        41C
+CONVERT_START_LOCATION  404
+CONVERT_STR_TO_HEX  42E
+COUNT_MASTISSA      5CA
+EMPTY_LINE          6BA
+END_CONVERT_LOOP    42C
+END_CONVERT_START_LOCATION  414
+END_PROGRAM         6B4
+END_SHIFT_START_ADDR  592
+EXTRACT_EXP         5B8
+EXTRACT_MANT        5C4
+INCREMENT_MANT      5DE
+INPUT_ADDRESS       744
+INPUT_PROMPT        6BB
+INVALID_CHARACTER   4E4
+NEGATIVE            5AA
+OUTPUT_EXPONENT     729
+OUTPUT_MANTISSA     734
+OUTPUT_SEPARATOR    6FB
+OUTPUT_SIGNBIT      71E
+OUTPUT_SIGNBIT_NEGATIVE  741
+OUTPUT_SIGNBIT_POSITIVE  73F
+PRIME_EXPONENT      60C
+PRIME_MANTISSA      624
+PRIME_SIGNBIT       5EC
+PRINT_EMPTY_LINE    644
+PRINT_INPUT_PROMPT  652
+PRINT_OUTPUT_EXPONENT  698
+PRINT_OUTPUT_MANTISSA  6A6
+PRINT_OUTPUT_SEPARATOR  660
+PRINT_OUTPUT_SIGNBIT  66E
+PRINT_RESULT        5E6
+PRINT_SIGNBIT_NEGATIVE  68A
+PRINT_SIGNBIT_POSITIVE  67C
+ROTATE_DONE         5E2
+ROTATE_LOOP         5CC
+SHIFT_START_ADDR    588
+SIGNBIT_NEG         5FC
+SIGNBIT_POS         604
+START               400
+STORE_EXP           5BE
+STR_TO_HEX_A        54C
+STR_TO_HEX_B        556
+STR_TO_HEX_C        560
+STR_TO_HEX_D        56A
+STR_TO_HEX_E        574
+STR_TO_HEX_EIGHT    538
+STR_TO_HEX_F        57E
+STR_TO_HEX_FIVE     51A
+STR_TO_HEX_FOUR     510
+STR_TO_HEX_NINE     542
+STR_TO_HEX_ONE      4F2
+STR_TO_HEX_SEVEN    52E
+STR_TO_HEX_SIX      524
+STR_TO_HEX_THREE    506
+STR_TO_HEX_TWO      4FC
+STR_TO_HEX_ZERO     4E8

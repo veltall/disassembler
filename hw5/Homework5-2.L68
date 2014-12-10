@@ -1,0 +1,214 @@
+00000400 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.15.02
+Created On: 11/28/2014 9:27:58 PM
+
+00000000                             1  *----------------------------------------------------------------------------
+00000000                             2  * Title      :      Homework 5 part 2 // Pattern finding and Cumulative sum
+00000000                             3  * Written by :      Vu Dinh
+00000000                             4  * Date       :      Nov 28 2014
+00000000                             5  * Comment    :      There are a lot of vague specifications of the program.
+00000000                             6  *                   I've created some test cases and stated expected results.
+00000000                             7  *----------------------------------------------------------------------------
+00000000                             8  
+00000000                             9  
+00000400                            10      ORG    $400
+00000400                            11  START:                  ; first instruction of program
+00000400                            12  
+00000400                            13  * ------------------------------------
+00000400                            14  * --------- PART 3: TESTING ----------
+00000400                            15  * ------------------------------------
+00000400                            16  
+00000400  1E3C 0000                 17  TEST_CASE   MOVE.B  #$0, D7     * -- test case number
+00000404  BE3C 0001                 18              CMP.B   #$1, D7
+00000408  6700 00FE                 19              BEQ     TEST_CASE_1
+0000040C  BE3C 0002                 20              CMP.B   #$2, D7
+00000410  6700 0102                 21              BEQ     TEST_CASE_2
+00000414  BE3C 0003                 22              CMP.B   #$3, D7
+00000418  6700 0106                 23              BEQ     TEST_CASE_3
+0000041C  BE3C 0004                 24              CMP.B   #$4, D7
+00000420  6700 0112                 25              BEQ     TEST_CASE_4
+00000424  6000 0120                 26  DEFAULT     BRA     NO_TEST
+00000428                            27  
+00000428                            28  
+00000428                            29  
+00000428                            30  * ------------------------------------
+00000428                            31  * --- PART 1: PATTERN MATCHING -------
+00000428                            32  * ------------------------------------
+00000428                            33  * | Tested for the following cases:  |
+00000428                            34  * | >> Pattern found immediately at  |
+00000428                            35  * |    $A000                         |
+00000428                            36  * | >> Pattern not found             |
+00000428                            37  * | >> Pattern found between $A000   |
+00000428                            38  * |    and $B000                     |
+00000428                            39  * ------------------------------------
+00000428                            40  
+00000428                            41  
+00000428  4241                      42  START_PART1 CLR     D1   
+0000042A                            43      
+0000042A  287C 0000A000             44              MOVEA.L     #CMP_START_ADDR, A4         * -- starting search location
+00000430  B9FC 0000B000             45  LOOP        CMPA.L      #CMP_END_ADDR, A4           * -- ending search location
+00000436  6700 001C                 46              BEQ         NOT_FOUND
+0000043A  2A4C                      47              MOVEA.L     A4, A5                      * -- keep a copy before incrementing A4
+0000043C                            48          
+0000043C  181C                      49  COMPARE     MOVE.B      (A4)+, D4                   * -- currently processed data
+0000043E  B839 00007A50             50              CMP.B       CMP_ADDR, D4
+00000444  6700 0004                 51              BEQ         FOUND
+00000448  60E6                      52  ENDLOOP     BRA         LOOP
+0000044A                            53          
+0000044A  23CD 00000578             54  FOUND       MOVE.L      A5, ADDR1                   * -- match is found addr1 = matched location
+00000450  6000 0010                 55              BRA         CSUM
+00000454                            56                  
+00000454  23FC 000A0000 00000578    57  NOT_FOUND   MOVE.L      #NOTFOUND_ADDR, ADDR1        * -- match not found, addr1 = special value
+0000045E  6000 0002                 58              BRA         CSUM
+00000462                            59          
+00000462                            60  
+00000462                            61  * ------------------------------------
+00000462                            62  * --- PART 2: CUMULATIVE SUM ---------
+00000462                            63  * ------------------------------------
+00000462                            64  * | Tested for the following cases:  |
+00000462                            65  * | >> Change one summand to $00     |
+00000462                            66  * ------------------------------------
+00000462                            67  
+00000462  4244                      68  CSUM    CLR         D4
+00000464  267C 00000000             69          MOVEA.L     #$0, A3                 * -- resetting A3
+0000046A  343C 0200                 70          MOVE.W      #ITER, D2               * -- D2 = loop counter
+0000046E  2C79 00000578             71          MOVEA.L     ADDR1, A6
+00000474                            72          
+00000474  B4BC 00000000             73  SUM_LOOP    CMP.L       #0, D2
+0000047A  6700 0014                 74              BEQ         SUM_FINISH
+0000047E  1A1E                      75              MOVE.B      (A6)+, D5           * -- data is extracted as BYTE
+00000480  D845                      76              ADD.W       D5, D4              * -- but summed as WORD
+00000482  6500 0006                 77              BCS         SET_CARRY           * -- if the carry bit is set, record it
+00000486  5382                      78  LOOPBACK    SUB.L       #1, D2
+00000488  60EA                      79              BRA         SUM_LOOP
+0000048A                            80  
+0000048A  1C3C 0001                 81  SET_CARRY   MOVE.B      #1, D6              * -- record carry bit
+0000048E  60F6                      82              BRA         LOOPBACK            * -- going back into loop
+00000490                            83          
+00000490  33C4 0000057C             84  SUM_FINISH  MOVE.W  D4, ADDSUM              * -- move the sum to requested location
+00000496  13C6 0000057E             85              MOVE.B  D6, CARRYBIT            * -- move the carry bit to the requested location
+0000049C  6000 0002                 86              BRA     PRINTRESULT
+000004A0                            87    
+000004A0  43F9 0000054E             88  PRINTRESULT LEA     ADDR1_OUTPUT, A1
+000004A6  103C 000E                 89              MOVE.B  #14, D0
+000004AA  4E4F                      90              TRAP    #15
+000004AC  2239 00000578             91              MOVE.L  ADDR1, D1           * -- printing ADDR1
+000004B2  143C 0010                 92              MOVE.B  #16,D2
+000004B6  103C 000F                 93              MOVE.B  #15,D0
+000004BA  4E4F                      94              TRAP    #15
+000004BC                            95             
+000004BC  43F9 00000576             96              LEA     EMPTY_LINE, A1      * -- printing empty line
+000004C2  103C 000D                 97              MOVE.B  #13,D0
+000004C6  4E4F                      98              TRAP    #15
+000004C8                            99              
+000004C8  43F9 00000557            100              LEA     SUM_OUTPUT, A1
+000004CE  103C 000E                101              MOVE.B  #14, D0
+000004D2  4E4F                     102              TRAP    #15
+000004D4  2204                     103              MOVE.L  D4, D1              * -- printing the sum (stored temporarily in D4)
+000004D6  143C 0010                104              MOVE.B  #16,D2              * -- the sum is printed in hex format
+000004DA  103C 000F                105              MOVE.B  #15,D0
+000004DE  4E4F                     106              TRAP    #15
+000004E0                           107              
+000004E0  43F9 00000576            108              LEA     EMPTY_LINE, A1      * -- empty line
+000004E6  103C 000D                109              MOVE.B  #13,D0
+000004EA  4E4F                     110              TRAP    #15
+000004EC                           111              
+000004EC  43F9 00000569            112              LEA     CARRY_OUTPUT, A1
+000004F2  103C 000E                113              MOVE.B  #14, D0
+000004F6  4E4F                     114              TRAP    #15
+000004F8  2206                     115              MOVE.L  D6, D1              * -- the carry bit information (overwrites D1)
+000004FA  143C 0010                116              MOVE.B  #16,D2
+000004FE  103C 000F                117              MOVE.B  #15,D0
+00000502  4E4F                     118              TRAP    #15
+00000504                           119  
+00000504                           120  
+00000504                           121  * ------------------------------------
+00000504                           122  * --------- PART 3: TESTING ----------
+00000504                           123  * ------------------------------------
+00000504                           124  
+00000504  6000 0044                125      BRA         END_PROGRAM
+00000508                           126  
+00000508                           127  * -- Test #1: Try a compare value that will never be found (ADDR1 = $A00000)
+00000508  21FC AAAAAAAA 7A50       128  TEST_CASE_1     MOVE.L  #$AAAAAAAA, $7A50
+00000510  6000 FF16                129                  BRA     START_PART1
+00000514                           130  
+00000514                           131  * -- Test #2: Make minor modification to the stream of data from $A000 (found immediately)
+00000514  13FC 0000 0000A001       132  TEST_CASE_2     MOVE.B  #$00, $A001     * -- Sum = 0xFE00 - 0xFF = 0xFD01
+0000051C  6000 FF0A                133                  BRA     START_PART1
+00000520                           134  
+00000520                           135  * -- Test #3: Make minor modification to the stream of data from $A0000 (not found)
+00000520  21FC AAAAAAAA 7A50       136  TEST_CASE_3     MOVE.L  #$AAAAAAAA, $7A50
+00000528  13FC 0000 000A0001       137                  MOVE.B  #$00, $A0001    * -- Sum = 0xFE00 - 0xFF = 0xFD01
+00000530  6000 FEF6                138                  BRA     START_PART1
+00000534                           139  
+00000534                           140  * -- Test #4: Try a compare value that will be found at the middle of the range $A000 to $B000
+00000534                           141  *             Expect to see the sum not overflowing.
+00000534  11FC 0013 7A50           142  TEST_CASE_4     MOVE.B  #$13, $7A50
+0000053A  13FC 0013 0000A051       143                  MOVE.B  #$13, $A051     * -- ADDR1 = A051
+00000542  6000 FEE4                144                  BRA     START_PART1
+00000546                           145  
+00000546  6000 FEE0                146  NO_TEST         BRA     START_PART1
+0000054A                           147  
+0000054A  FFFF FFFF                148  END_PROGRAM     SIMHALT
+0000054E                           149  
+0000054E                           150  * Put variables and constants here
+0000054E                           151  
+0000054E                           152  
+0000054E  =0000A000                153  CMP_START_ADDR  EQU     $A000
+0000054E  =0000B000                154  CMP_END_ADDR    EQU     $B000
+0000054E  =00007A50                155  CMP_ADDR        EQU     $7A50
+0000054E  =000A0000                156  NOTFOUND_ADDR   EQU     $A0000
+0000054E  =00000200                157  ITER            EQU     512
+0000054E                           158  
+0000054E                           159  
+0000054E= 41 44 44 52 31 20 ...    160  ADDR1_OUTPUT    DC.B    'ADDR1 = ', 0
+00000557= 43 55 4D 55 4C 41 ...    161  SUM_OUTPUT      DC.B    'CUMULATIVE SUM = ', 0
+00000569= 43 41 52 52 59 20 ...    162  CARRY_OUTPUT    DC.B    'CARRY BIT = ', 0
+00000576= 00                       163  EMPTY_LINE      DC.B    '', 0
+00000577                           164  
+00000578                           165  ADDR1           DS.L    $1
+0000057C                           166  ADDSUM          DS.W    $1
+0000057E                           167  CARRYBIT        DS.B    $1
+0000057F                           168  
+0000057F                           169      END    START        ; last line of source
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+ADDR1               578
+ADDR1_OUTPUT        54E
+ADDSUM              57C
+CARRYBIT            57E
+CARRY_OUTPUT        569
+CMP_ADDR            7A50
+CMP_END_ADDR        B000
+CMP_START_ADDR      A000
+COMPARE             43C
+CSUM                462
+DEFAULT             424
+EMPTY_LINE          576
+ENDLOOP             448
+END_PROGRAM         54A
+FOUND               44A
+ITER                200
+LOOP                430
+LOOPBACK            486
+NOTFOUND_ADDR       A0000
+NOT_FOUND           454
+NO_TEST             546
+PRINTRESULT         4A0
+SET_CARRY           48A
+START               400
+START_PART1         428
+SUM_FINISH          490
+SUM_LOOP            474
+SUM_OUTPUT          557
+TEST_CASE           400
+TEST_CASE_1         508
+TEST_CASE_2         514
+TEST_CASE_3         520
+TEST_CASE_4         534

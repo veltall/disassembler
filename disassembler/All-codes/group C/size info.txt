@@ -1,0 +1,14 @@
+
+Size information for AND, DOES NOT APPLY TO MULS!
+
+Byte - 000
+Word - 001
+Long - 010
+
+^^^^ above will give <ea>, Dn -> Dn
+
+Byte - 100
+Word - 101
+Long - 110
+
+^^^ above will give Dn, <ea> -> <ea>

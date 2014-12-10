@@ -1,0 +1,11 @@
+OP MODE -
+	EOR - Byte - 100
+	      Word - 101
+	      Long - 110	 	
+
+	CMP - Byte - 000
+	      Word - 001
+ 	      Long - 010
+
+	CMPA - Word - 011
+	       Long - 111

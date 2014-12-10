@@ -1,0 +1,63 @@
+00000400 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.15.02
+Created On: 10/26/2014 2:37:08 PM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : HW3-Q5 Program
+00000000                             3  * Written by : Wooyoung Kim
+00000000                             4  * Date       : n/a
+00000000                             5  * Description: This program is given to the students to analyze
+00000000                             6  *-----------------------------------------------------------
+00000000                             7  
+00000000                             8  *-------------------------------------
+00000000                             9  * Definition of "variables"
+00000000                            10  *-------------------------------------
+00000000                            11  
+00000000  =00004000                 12  addr1   EQU $4000
+00000000  =00004001                 13  addr2   EQU $4001
+00000000  =0000A7FF                 14  data2   EQU $A7FF
+00000000  =00005555                 15  data3   EQU $5555
+00000000  =00000000                 16  data4   EQU $0000
+00000000  =00001246                 17  data5   EQU 4678
+00000000  =0000004F                 18  data6   EQU %01001111
+00000000  =00000017                 19  data7   EQU %00010111
+00000000                            20  
+00000000                            21  
+00000000                            22  
+00000000                            23  *-------------------------------------
+00000000                            24  * Program logic
+00000000                            25  *-------------------------------------
+00000000                            26  
+00000400                            27          ORG     $400
+00000400                            28          
+00000400  303C A7FF                 29  start   MOVE.W  #data2,D0
+00000404  123C 004F                 30          MOVE.B  #data6,D1
+00000408  143C 0017                 31          MOVE.B  #data7,D2
+0000040C  363C 5555                 32          MOVE.W  #data3,D3
+00000410                            33          
+00000410  307C 4000                 34          MOVEA.W #addr1,A0
+00000414  10C1                      35          MOVE.B  D1,(A0)+
+00000416  10C2                      36          MOVE.B  D2,(A0)+
+00000418                            37          
+00000418  327C 4000                 38          MOVEA.W #addr1,A1
+0000041C  C751                      39          AND.W   D3,(A1)
+0000041E                            40          
+0000041E  4EF8 0400                 41          JMP     start
+00000422                            42          END     $400
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+ADDR1               4000
+ADDR2               4001
+DATA2               A7FF
+DATA3               5555
+DATA4               0
+DATA5               1246
+DATA6               4F
+DATA7               17
+START               400

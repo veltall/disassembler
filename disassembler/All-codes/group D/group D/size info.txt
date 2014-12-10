@@ -1,0 +1,23 @@
+Size for ADD
+
+Byte - 000
+Word - 001
+Long - 010
+
+^^^ above is for <ea> + Dn -> Dn
+
+
+Byte - 100
+Word - 101
+Long - 110
+
+^^^ above is for Dn + <ea> -> <ea>
+
+
+Size for ADDA
+
+//it requires 3 bits, only passed left most bit
+
+Word - 011
+Long - 111
+

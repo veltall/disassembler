@@ -1,0 +1,62 @@
+00001000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.15.02
+Created On: 10/31/2014 9:28:40 PM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : Homework 4
+00000000                             3  * Written by : Vu Dinh
+00000000                             4  * Date       : October 31 2014
+00000000                             5  * Description: I'm late I'm late I'm lateeeee
+00000000                             6  *-----------------------------------------------------------
+00001000                             7      ORG    $1000
+00001000                             8  START:                  ; first instruction of program
+00001000                             9  
+00001000                            10  * Put program code here
+00001000                            11  
+00001000  143C 009D                 12      MOVE.B #$9D, D2     * test conversion
+00001004  11FC 00D9 6000            13      MOVE.B #$D9, $6000  * specified address for result       
+0000100A                            14  
+0000100A  D538 6000                 15      ADD.B   D2, $6000   * Addition  
+0000100E                            16  
+0000100E  6900 0006                 17      BVS     OVERFLOW    
+00001012  6800 0012                 18      BVC     NOOVERFLOW  
+00001016                            19      
+00001016  43F9 0000106A             20  OVERFLOW    LEA BADMSG, A1 
+0000101C  103C 000E                 21              MOVE.B  #14, D0
+00001020  4E4F                      22              TRAP    #15
+00001022  6000 0012                 23              BRA     PRINTRESULT 
+00001026                            24  
+00001026                            25  
+00001026  43F9 00001044             26  NOOVERFLOW  LEA GOODMSG, A1
+0000102C  103C 000E                 27              MOVE.B  #14, D0
+00001030  4E4F                      28              TRAP    #15
+00001032  6000 0002                 29              BRA     PRINTRESULT
+00001036                            30  
+00001036  1238 6000                 31  PRINTRESULT     MOVE.B  $6000, D1   * prime for output    
+0000103A  103C 0003                 32                  MOVE.B  #3, D0      * load trap task #3 
+0000103E  4E4F                      33                  TRAP    #15 
+00001040                            34  
+00001040                            35  
+00001040  FFFF FFFF                 36      SIMHALT             ; halt simulator
+00001044                            37  
+00001044                            38  * Put variables and constants here
+00001044                            39     
+00001044= 54 68 65 72 65 20 ...     40  GOODMSG         DC.B    'There were no overflows, the sum is: ',0
+0000106A                            41  
+0000106A= 4F 76 65 72 66 6C ...     42  BADMSG          DC.B    'Overflow happened, the sum is not reliable: ',0    
+00001097                            43  
+00001097                            44      END    START        ; last line of source
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+BADMSG              106A
+GOODMSG             1044
+NOOVERFLOW          1026
+OVERFLOW            1016
+PRINTRESULT         1036
+START               1000

@@ -1,0 +1,3 @@
+SIZE -  Byte - 01   (does not apply for MOVEA)
+	Word - 11
+	Long - 10
