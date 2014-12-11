@@ -38,3 +38,17 @@ MOVE_PROCESS JSR     DECODE_WEIRD_SIZE     * -- MOVE supports byte, word, and lo
                                             * -- 2 bits for SIZE
             JSR     DECODE_EA_MODE
             BRA     MOVE_ARRANGE_OUTPUT
+
+MOVE_ARRANGE_OUTPUT     MOVE.B            #'M', (A3)+
+                        MOVE.B            #'O', (A3)+
+                        MOVE.B            #'V', (A3)+
+                        MOVE.B            #'E', (A3)+
+                        MOVE.L            SIZE_OUT, (A3)+
+
+                        JSR               PRINT_EA_MODE
+                        MOVE.B            #' ', (A3)+
+                        MOVE.B            #' ', (A3)+
+                        MOVE.B            #' ', (A3)+
+                        MOVE.B            #',', (A3)+
+                        JSR               PRINT_DEST_MODE
+

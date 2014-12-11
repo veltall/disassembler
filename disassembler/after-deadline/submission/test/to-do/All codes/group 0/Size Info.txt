@@ -1,0 +1,3 @@
+size -	Byte = 00
+	Word = 01
+	Long = 10

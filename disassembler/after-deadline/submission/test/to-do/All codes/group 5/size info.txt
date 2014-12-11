@@ -1,0 +1,5 @@
+SIZE for ADDQ
+
+Byte - 00
+Word - 01
+Long - 10

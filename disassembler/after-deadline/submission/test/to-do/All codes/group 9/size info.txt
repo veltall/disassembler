@@ -1,0 +1,20 @@
+Size for SUB
+
+Byte - 000
+Word - 001
+Long - 010
+
+^^^ above makes Dn - <ea> -> Dn
+
+Byte - 100
+Word - 101
+Long - 110
+
+^^^ above makes <ea> - Dn -> <ea>
+
+----------------------------------------
+
+Size for SUBA
+
+Word - 011
+Long - 111
